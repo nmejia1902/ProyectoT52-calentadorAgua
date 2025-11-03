@@ -30,7 +30,7 @@
   .btn{appearance:none;border:1px solid var(--border);background:#fff;color:var(--ink);
     padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;transition:.2s ease;display:inline-flex;align-items:center;gap:10px}
   .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0)}
-  .btn-primary{background:var(--primary);border-color:transparent;color:#fff}
+  .btn-primary{background:var(--primary);border-color:transparent;color:#fff;text-decoration: none;}
   .btn-success{background:var(--success);border-color:transparent;color:#fff}
   .btn-danger{background:var(--danger);border-color:transparent;color:#fff}
   .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--primary)}
