@@ -1,0 +1,51 @@
+{
+  "usuarios": {
+    "ID_usuario": {
+      "nombre": "",
+      "perfil": ""
+    }
+  },
+  "tanques": {
+    "id_tanque": {
+      "descripcion": "",
+      "tipo": "",
+      "capacidad": ""
+    }
+  },
+  "sensores": {
+    "id_sensor": {
+      "tipo": "",
+      "unidad_medida": "",
+      "rango_min": 0,
+      "rango_max": 0,
+      "precision": 0,
+      "activo": false
+    }
+  },
+  "actuadores": {
+    "id_dispositivo": {
+      "tipo": "",
+      "potencia_w": 0,
+      "diametro_pulg": 0,
+      "activo": false
+    }
+  },
+  "alertas": {
+    "id_alerta": {
+      "codigo": "",
+      "mensaje": "",
+      "severidad": "",
+      "generada_ame": "",
+      "atendida_pore": ""
+    }
+  },
+  "registro_eventos": {
+    "id_evento": {
+      "usuario_ref": "",
+      "id_entidad": "",
+      "entidad": "",
+      "descripcion": "",
+      "creado_en": ""
+    }
+  }
+}

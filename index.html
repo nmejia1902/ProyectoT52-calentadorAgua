@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Control del Calentador</title>
+  <link rel="stylesheet" href="/asset/css/main.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="card" role="application" aria-label="Control del calentador de agua">
+      <header>
+        <div class="title">CONTROL DEL CALENTADOR</div>
+        <div class="badge" id="headerMode">MODO AUTOMÁTICO</div>
+      </header>
+      <div class="grid">
+        <div class="tank-card">
+          <div class="tank-head">
+            <strong>Estado del tanque</strong>
+            <div class="legend" aria-hidden="true">
+              <div class="item"><span class="swatch" style="background:var(--success)"></span>Llenado</div>
+              <div class="item"><span class="swatch" style="background:var(--danger)"></span>Vaciado</div>
+              <div class="item"><span class="swatch" style="background:var(--accent)"></span>Resistencia</div>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom:10px; align-items:center;">
+            <label for="tankSize"><strong>Dimensiones del tanque:</strong></label>
+            <select id="tankSize" class="btn" style="font-weight:600;">
+              <option value="150">10 personas (150 L)</option>
+              <option value="400" selected>20 personas (400 L)</option>
+              <option value="800">30 personas (800 L)</option>
+            </select>
+          </div>
+          <div style="display:grid;place-items:center;padding:10px 0">
+            <svg id="tankSvg" viewBox="0 0 320 280" width="100%" style="max-width:360px">
+              <defs>
+                <clipPath id="waterClip">
+                  <rect id="waterRect" x="70" y="60" width="180" height="180" rx="18" ry="18" />
+                </clipPath>
+                <linearGradient id="waterGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#60A5FA" />
+                  <stop offset="100%" stop-color="#2563EB" />
+                </linearGradient>
+              </defs>
+              <rect x="60" y="50" rx="26" ry="26" width="200" height="200" fill="#E5E7EB" stroke="#94A3B8"
+                stroke-width="6" />
+              <line id="upperLimit" x1="70" y1="69" x2="250" y2="69" stroke="#EF4444" stroke-width="3"
+                stroke-dasharray="4,4" />
+              <text x="255" y="72" font-family="inherit" font-size="10" font-weight="bold" fill="#EF4444">95%</text>
+              <g clip-path="url(#waterClip)">
+                <rect id="waterFill" x="70" y="200" width="180" height="40" fill="url(#waterGrad)" />
+                <path id="wave" d="M60,190 Q90,180 120,190 T180,190 T240,190 T300,190 L300,260 L60,260 Z"
+                  fill="rgba(255,255,255,.25)" />
+              </g>
+              <g id="coilGroup">
+                <path id="coil" d="M100,210 q20,20 40,0 t40,0 t40,0" fill="none" stroke="#F59E0B" stroke-width="10"
+                  stroke-linecap="round" />
+              </g>
+              <g>
+                <circle cx="40" cy="120" r="16" fill="var(--success)" />
+                <rect x="56" y="112" width="30" height="16" rx="4" fill="#9CA3AF" />
+                <circle cx="280" cy="120" r="16" fill="var(--danger)" />
+                <rect x="234" y="112" width="30" height="16" rx="4" fill="#9CA3AF" />
+              </g>
+              <text id="autoLabel" x="160" y="140" text-anchor="middle" font-family="inherit" font-weight="800"
+                font-size="22" fill="#0B3D5C">AUTO</text>
+              <line id="lowerLimit" x1="70" y1="231" x2="250" y2="231" stroke="#EF4444" stroke-width="3"
+                stroke-dasharray="4,4" />
+              <text x="255" y="234" font-family="inherit" font-size="10" font-weight="bold" fill="#EF4444">10%</text>
+            </svg>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <h4>Nivel de agua</h4>
+              <div class="val mono"><span id="levelVal">—</span>%</div>
+              <div class="chip" id="valvesText">Válvulas: cerradas</div>
+            </div>
+            <div class="metric">
+              <h4>Temperatura</h4>
+              <div class="val mono"><span id="tempVal">—</span> °C</div>
+              <div class="chip" id="heaterText"><span class="state-dot dot-off"></span>Resistencia apagada</div>
+            </div>
+          </div>
+          <div id="alarmBar" class="alarm-bar" role="alert" aria-live="assertive" style="margin-top:12px">
+            <span>⚠️ <strong>ALARMA DE SOBRETEMPERATURA</strong>: <span class="mono" id="alarmTemp">—</span> °C (umbral
+              <span class="mono" id="alarmThVal">—</span> °C)</span>
+            <div class="row" style="gap:8px">
+              <button id="btnAck" class="btn">Restablecer alarma</button>
+              <button id="btnMute" class="btn btn-outline" aria-pressed="false">Silenciar</button>
+            </div>
+          </div>
+        </div>
+        <div class="controls" aria-label="Controles">
+          <div class="power" role="group" aria-label="Alimentación del sistema">
+            <div class="status">
+              <span id="powerDot" class="state-dot dot-off" aria-hidden="true"></span>
+              <strong><span id="powerText">Sistema apagado</span></strong>
+            </div>
+            <button id="btnPower" class="btn btn-primary" aria-pressed="false">ENCENDER</button>
+          </div>
+          <div class="row" role="group" aria-label="Válvulas">
+            <button id="btnFill" class="btn btn-success" aria-pressed="false">Llenado: CERRADO</button>
+            <button id="btnDrain" class="btn btn-danger" aria-pressed="false">Vaciado: CERRADO</button>
+            <span class="chip">Ambas abiertas no están permitidas</span>
+          </div>
+          <div class="row" role="group" aria-label="Control de la resistencia">
+            <button id="btnMode" class="btn btn-outline" aria-pressed="true">Modo automático</button>
+            <button id="btnHeater" class="btn" aria-pressed="false" disabled>Resistencia: APAGADA</button>
+          </div>
+          <div class="slider-wrap" aria-label="Ajuste de temperatura">
+            <div class="slider-label">
+              <label for="setpoint"><strong>Temperatura manual</strong></label>
+              <span class="mono"><span id="spVal">55</span> °C</span>
+            </div>
+            <input id="setpoint" type="range" min="30" max="60" value="50" step="1" />
+            <div class="row" style="justify-content:space-between;color:var(--muted);font-size:12px">
+              <span>30 °C</span><span>60 °C</span>
+            </div>
+          </div>
+          <div class="slider-wrap" aria-label="Ajuste de alarma">
+            <div class="slider-label">
+              <label for="alarmTh"><strong>Umbral de alarma por sobretemperatura</strong></label>
+              <span class="mono"><span id="alarmThText">70</span> °C</span>
+            </div>
+            <input id="alarmTh" type="range" min="40" max="80" value="55" step="1" />
+            <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:12px">
+              <span>40 °C</span><span>80 °C</span>
+            </div>
+            <span class="chip"> +-2 °C · la resistencia se apaga al dispararse</span>
+          </div>
+          <div class="sep"></div>
+
+          <div class="row" role="button" aria-label="Generacion de reportes">
+            <a id="btnReport" href="https://docs.google.com/spreadsheets/d/1FB6p-o_z7_jg07CE-_wDu_MLZfScnSk0Y0dL8lp0q9w/edit?usp=sharing" target="_blank" class="btn btn-primary">Generar reporte</a>
+          </div>
+
+          <div class="legend" aria-hidden="true">
+            <div class="item"><span class="state-dot dot-on"></span>Sistema listo</div>
+            <div class="item">Actualiza cada <strong>0,5 s</strong> en modo simulación</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- Firebase SDKs con compatibilidad -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBLZWAv5RriCk5Cb1NZ4_9i_DDslZmOFR8",
+      authDomain: "calentador-inteligente-d9034.firebaseapp.com",
+      databaseURL: "https://calentador-inteligente-d9034-default-rtdb.firebaseio.com",
+      projectId: "calentador-inteligente-d9034",
+      storageBucket: "calentador-inteligente-d9034.firebasestorage.app",
+      messagingSenderId: "671835181437",
+      appId: "1:671835181437:web:c01b85197a76bba4257c14"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+  <script src="/asset/js/app.js"></script>
+  <script>
+    setInterval(() => {
+      if (window.state) {
+        db.ref("lecturas/actual").set({
+          temperatura: state.t,
+          nivel: state.level,
+          resistencia: state.heaterOn,
+          llenado: state.fillOpen,
+          vaciado: state.drainOpen,
+          alarma: state.alarmActive,
+          capacidad: state.capacity,
+          modoAutomatico: state.auto,
+          fecha: new Date().toISOString()
+        });
+      }
+    }, 2000);
+  </script>
+</body>
+
+</html>
